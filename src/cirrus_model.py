@@ -43,6 +43,7 @@ from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from pathlib import Path
+import argparse
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -51,6 +52,104 @@ np.random.seed(42)
 ROOT_DIR = Path(__file__).resolve().parents[1]
 OUTPUTS_DIR = ROOT_DIR / "outputs"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR = ROOT_DIR / "data"
+
+BATH_REQUIRED_COLUMNS = [
+    "ph", "orp_mv", "ion_ppm", "turbidity", "temp_c",
+    "lots_run", "bath_age_hr", "remaining_life_pct"
+]
+
+HEAT_REQUIRED_COLUMNS = [
+    "exhaust_temp_c", "flow_rate_m3h", "di_demand_kw",
+    "hvac_demand_kw", "orc_capacity_pct", "time_of_day_hr", "routing"
+]
+
+
+def parse_args():
+    """Parse optional CSV paths for real-data mode."""
+    parser = argparse.ArgumentParser(
+        description="Run CIRRUS with synthetic data or user-provided CSV files."
+    )
+    parser.add_argument(
+        "--bath-data",
+        type=Path,
+        default=DATA_DIR / "bath_data.csv",
+        help="Path to bath subsystem CSV. Default: data/bath_data.csv",
+    )
+    parser.add_argument(
+        "--heat-data",
+        type=Path,
+        default=DATA_DIR / "heat_data.csv",
+        help="Path to heat subsystem CSV. Default: data/heat_data.csv",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["auto", "synthetic", "real"],
+        default="auto",
+        help=(
+            "Data mode: auto (use CSVs if both exist, else synthetic), "
+            "synthetic (force generated data), real (require CSVs)."
+        ),
+    )
+    return parser.parse_args()
+
+
+def _validate_columns(df: pd.DataFrame, required_cols: list[str], dataset_name: str):
+    """Raise a readable error when required columns are missing."""
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"{dataset_name} CSV missing required columns: {missing}. "
+            f"Expected columns: {required_cols}"
+        )
+
+
+def load_real_data(bath_path: Path, heat_path: Path):
+    """Load and validate user-provided bath and heat datasets."""
+    if not bath_path.exists() or not heat_path.exists():
+        raise FileNotFoundError(
+            "Real mode requires both files to exist: "
+            f"bath={bath_path}, heat={heat_path}"
+        )
+
+    bath_df = pd.read_csv(bath_path)
+    heat_df = pd.read_csv(heat_path)
+
+    _validate_columns(bath_df, BATH_REQUIRED_COLUMNS, "Bath")
+    _validate_columns(heat_df, HEAT_REQUIRED_COLUMNS, "Heat")
+
+    # Standardize optional action field for consistency in reporting.
+    if "action" not in bath_df.columns:
+        bath_df["action"] = pd.cut(
+            bath_df["remaining_life_pct"],
+            bins=[-1, 20, 50, 101],
+            labels=["DUMP", "TOP-OFF", "CONTINUE"]
+        )
+
+    bath_df = bath_df.copy()
+    heat_df = heat_df.copy()
+    return bath_df, heat_df
+
+
+def load_data(mode: str, bath_path: Path, heat_path: Path):
+    """Resolve data source based on mode and file availability."""
+    if mode == "synthetic":
+        print("Generating synthetic fab sensor data...")
+        return generate_bath_data(n_samples=1200), generate_heat_data(n_samples=1200), "synthetic"
+
+    if mode == "real":
+        print(f"Loading real CSV data from {bath_path} and {heat_path}...")
+        bath_df, heat_df = load_real_data(bath_path, heat_path)
+        return bath_df, heat_df, "real"
+
+    # auto mode
+    if bath_path.exists() and heat_path.exists():
+        print(f"Auto mode: detected CSV files at {bath_path} and {heat_path}.")
+        bath_df, heat_df = load_real_data(bath_path, heat_path)
+        return bath_df, heat_df, "real"
+
+    print("Auto mode: CSV files not found for both subsystems. Falling back to synthetic data.")
+    return generate_bath_data(n_samples=1200), generate_heat_data(n_samples=1200), "synthetic"
 
 # =============================================================================
 # SECTION 1 — SYNTHETIC DATA GENERATION
@@ -533,16 +632,16 @@ def plot_cirrus_dashboard(
 # =============================================================================
 
 if __name__ == "__main__":
+    args = parse_args()
 
     print("\n╔══════════════════════════════════════════════════════════╗")
     print("║  CIRRUS — Integrated ML Platform  |  Team 28             ║")
     print("║  SEMICON SEA 2026 TECH Zoomers Challenge                 ║")
     print("╚══════════════════════════════════════════════════════════╝\n")
 
-    # Generate synthetic data
-    print("Generating synthetic fab sensor data...")
-    bath_df = generate_bath_data(n_samples=1200)
-    heat_df = generate_heat_data(n_samples=1200)
+    # Load real data or generate synthetic data
+    bath_df, heat_df, data_mode = load_data(args.mode, args.bath_data, args.heat_data)
+    print(f"Data mode: {data_mode}")
     print(f"  Bath dataset : {bath_df.shape}  |  Action dist: {bath_df['action'].value_counts().to_dict()}")
     print(f"  Heat dataset : {heat_df.shape}  |  Route dist : {heat_df['routing'].value_counts().to_dict()}\n")
 

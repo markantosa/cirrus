@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CIRRUS Block Diagram (Poster)</title>
+  <style>
+    :root {
+      --bg: #f3f7fc;
+      --ink: #0f172a;
+      --muted: #27466b;
+
+      --edge-bg: #dbeafe;
+      --edge-border: #1d4ed8;
+
+      --a-bg: #cffafe;
+      --a-border: #0891b2;
+
+      --b-bg: #ffedd5;
+      --b-border: #ea580c;
+
+      --a2-bg: #ecfeff;
+      --a2-border: #0e7490;
+
+      --b2-bg: #fff7ed;
+      --b2-border: #c2410c;
+
+      --a3-bg: #dcfce7;
+      --a3-border: #15803d;
+
+      --b3-bg: #fef3c7;
+      --b3-border: #b45309;
+
+      --dash-bg: #ede9fe;
+      --dash-border: #6d28d9;
+
+      --line: #2f4a73;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Segoe UI", "Poppins", "Aptos", "Arial", sans-serif;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .poster {
+      width: 1500px;
+      max-width: 96vw;
+      background: var(--bg);
+      padding: 24px 36px 30px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      position: relative;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 52px;
+      line-height: 1.05;
+      font-weight: 800;
+      color: #134166;
+      margin: 0;
+      letter-spacing: 0.3px;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 8px 0 18px;
+      color: var(--muted);
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .row {
+      display: grid;
+      gap: 24px;
+      margin-top: 12px;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .row-1 { grid-template-columns: 1fr; margin-top: 10px; }
+    .row-2, .row-3, .row-4 { grid-template-columns: 1fr 1fr; }
+    .row-5 { grid-template-columns: 1fr; }
+
+    .block {
+      border: 5px solid #000;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      text-align: center;
+      position: relative;
+      min-height: 138px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      z-index: 2;
+    }
+
+    .block h2 {
+      margin: 0;
+      font-size: 40px;
+      line-height: 1;
+      letter-spacing: 0.6px;
+      font-weight: 900;
+    }
+
+    .block p {
+      margin: 12px 0 0;
+      font-size: 31px;
+      line-height: 1.2;
+      font-weight: 700;
+      max-width: 95%;
+    }
+
+    .edge { background: var(--edge-bg); border-color: var(--edge-border); min-height: 166px; }
+    .sub-a { background: var(--a-bg); border-color: var(--a-border); }
+    .sub-b { background: var(--b-bg); border-color: var(--b-border); }
+    .sens-a { background: var(--a2-bg); border-color: var(--a2-border); min-height: 170px; }
+    .sens-b { background: var(--b2-bg); border-color: var(--b2-border); min-height: 170px; }
+    .out-a { background: var(--a3-bg); border-color: var(--a3-border); min-height: 128px; }
+    .out-b { background: var(--b3-bg); border-color: var(--b3-border); min-height: 128px; }
+    .dash { background: var(--dash-bg); border-color: var(--dash-border); min-height: 146px; }
+
+    .connector {
+      position: absolute;
+      background: var(--line);
+      z-index: 1;
+      border-radius: 99px;
+    }
+
+    .v { width: 6px; left: 50%; transform: translateX(-50%); }
+    .h { height: 6px; top: 50%; transform: translateY(-50%); }
+
+    .diag-wrap {
+      position: relative;
+      height: 30px;
+      margin-top: 0;
+      margin-bottom: -4px;
+    }
+
+    .diag {
+      position: absolute;
+      width: 6px;
+      height: 40px;
+      background: var(--edge-border);
+      top: -6px;
+      border-radius: 99px;
+      transform-origin: top center;
+      z-index: 1;
+    }
+
+    .diag.left {
+      left: calc(50% - 140px);
+      transform: rotate(60deg);
+    }
+
+    .diag.right {
+      right: calc(50% - 140px);
+      transform: rotate(-60deg);
+    }
+
+    .v-between {
+      height: 30px;
+      margin: -4px 0 -2px;
+      position: relative;
+    }
+
+    .v-between .connector {
+      top: 0;
+      height: 34px;
+    }
+
+    .split-lines {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: -6px;
+      margin-bottom: -2px;
+      position: relative;
+      height: 24px;
+    }
+
+    .split-lines .connector {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 24px;
+      top: 0;
+    }
+
+    .join-wrap {
+      position: relative;
+      height: 34px;
+      margin-top: -8px;
+      margin-bottom: -6px;
+    }
+
+    .join-wrap .left,
+    .join-wrap .right {
+      position: absolute;
+      width: 6px;
+      height: 42px;
+      background: var(--line);
+      border-radius: 99px;
+      top: -2px;
+    }
+
+    .join-wrap .left {
+      left: calc(50% - 180px);
+      transform: rotate(-58deg);
+      transform-origin: top center;
+    }
+
+    .join-wrap .right {
+      right: calc(50% - 180px);
+      transform: rotate(58deg);
+      transform-origin: top center;
+    }
+
+    @media (max-width: 1200px) {
+      .title { font-size: 38px; }
+      .subtitle { font-size: 18px; }
+      .block h2 { font-size: 30px; }
+      .block p { font-size: 22px; }
+      .diag.left { left: calc(50% - 110px); }
+      .diag.right { right: calc(50% - 110px); }
+      .join-wrap .left { left: calc(50% - 130px); }
+      .join-wrap .right { right: calc(50% - 130px); }
+    }
+
+    @media print {
+      @page { size: A1 landscape; margin: 8mm; }
+      body { padding: 0; }
+      .poster { width: 100%; box-shadow: none; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main id="poster" class="poster">
+    <h1 class="title">CIRRUS System Block Diagram</h1>
+    <div class="subtitle">Top-Down Architecture: Edge Compute -> Subsystems -> Sensor Stacks -> Outputs</div>
+
+    <section class="row row-1">
+      <article class="block edge">
+        <h2>EDGE COMPUTE</h2>
+        <p>Data Ingestion | Feature Processing | Model Inference | Rule Engine</p>
+      </article>
+    </section>
+
+    <div class="diag-wrap" aria-hidden="true">
+      <div class="diag left"></div>
+      <div class="diag right"></div>
+    </div>
+
+    <section class="row row-2">
+      <article class="block sub-a">
+        <h2>SUBSYSTEM A</h2>
+        <p>Wet Bath Lifecycle Model<br />Gradient Boosting Regressor</p>
+      </article>
+      <article class="block sub-b">
+        <h2>SUBSYSTEM B</h2>
+        <p>Heat Cascade Routing Model<br />Random Forest Classifier</p>
+      </article>
+    </section>
+
+    <div class="split-lines" aria-hidden="true">
+      <div class="connector"></div>
+      <div class="connector"></div>
+    </div>
+
+    <section class="row row-3">
+      <article class="block sens-a">
+        <h2>A SENSOR STACK</h2>
+        <p>pH | ORP | Conductivity | Ion-selective<br />Turbidity | Bath Temp | Recirc Flow | Level</p>
+      </article>
+      <article class="block sens-b">
+        <h2>B SENSOR STACK</h2>
+        <p>Exhaust Temp | Flow | Pressure<br />HX In-Out Temp &amp; Flow<br />DI/HVAC Sensors | ORC Temp/Pressure</p>
+      </article>
+    </section>
+
+    <div class="split-lines" aria-hidden="true">
+      <div class="connector"></div>
+      <div class="connector"></div>
+    </div>
+
+    <section class="row row-4">
+      <article class="block out-a">
+        <h2>A OUTPUTS</h2>
+        <p>CONTINUE | TOP-OFF | DUMP</p>
+      </article>
+      <article class="block out-b">
+        <h2>B OUTPUTS</h2>
+        <p>ORC | DI_PREHEAT | HVAC | BLEND</p>
+      </article>
+    </section>
+
+    <div class="join-wrap" aria-hidden="true">
+      <div class="left"></div>
+      <div class="right"></div>
+    </div>
+
+    <section class="row row-5">
+      <article class="block dash">
+        <h2>UNIFIED CIRRUS DASHBOARD + KPI LAYER</h2>
+        <p>Chemical Reduction | kWh Recovery | CO2e Reduction | Safety Events</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

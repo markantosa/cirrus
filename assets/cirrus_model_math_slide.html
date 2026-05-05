@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CIRRUS Model Math (1-Slide)</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --ink: #0f172a;
+      --muted: #334155;
+      --a-bg: #e0f7ff;
+      --a-border: #0b78a8;
+      --b-bg: #fff1e6;
+      --b-border: #d95f02;
+      --s-bg: #eef7ee;
+      --s-border: #2e7d32;
+      --m-bg: #f3ecff;
+      --m-border: #6a1b9a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Segoe UI", Aptos, Arial, sans-serif;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    .slide {
+      width: min(1800px, 98vw);
+      min-height: 980px;
+      background: var(--bg);
+      border-radius: 20px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+      padding: 28px 30px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 48px;
+      color: #103b66;
+      line-height: 1.05;
+    }
+
+    .sub {
+      margin: 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 21px;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      border: 4px solid;
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 29px;
+      line-height: 1.1;
+    }
+
+    .card ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+      font-size: 20px;
+      line-height: 1.28;
+      font-weight: 600;
+    }
+
+    .eq {
+      margin: 10px 0;
+      font-size: 24px;
+      line-height: 1.18;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .eq.small { font-size: 21px; }
+
+    .a { background: var(--a-bg); border-color: var(--a-border); }
+    .b { background: var(--b-bg); border-color: var(--b-border); }
+    .s { background: var(--s-bg); border-color: var(--s-border); }
+    .m { background: var(--m-bg); border-color: var(--m-border); }
+
+    .note {
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    @media (max-width: 1400px) {
+      .slide {
+        width: min(1320px, 98vw);
+        min-height: 900px;
+      }
+      h1 { font-size: 40px; }
+      .sub { font-size: 18px; }
+      .card h2 { font-size: 24px; }
+      .eq { font-size: 20px; }
+      .eq.small { font-size: 18px; }
+      .card ul { font-size: 17px; }
+      .note { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main id="slide" class="slide">
+    <h1>CIRRUS Model Math (Judge-Friendly)</h1>
+    <p class="sub">Only the equations needed to explain why each model is valid for our problem</p>
+
+    <section class="grid">
+      <article class="card a">
+        <h2>Subsystem A: Gradient Boosting Regression</h2>
+        <div class="eq">f_M(x) = f_0(x) + Σ[m=1..M] ν · h_m(x)</div>
+        <div class="eq">r_im = y_i - f_(m-1)(x_i)</div>
+        <div class="eq">f_m(x) = f_(m-1)(x) + ν · h_m(x)</div>
+        <div class="eq small">Action(y_pred): DUMP if y≤20, TOP-OFF if 20&lt;y≤50, CONTINUE if y&gt;50</div>
+        <div class="note">Meaning: learns nonlinear bath degradation, then converts prediction to operations.</div>
+      </article>
+
+      <article class="card b">
+        <h2>Subsystem B: Random Forest Classification</h2>
+        <div class="eq">ĉ(x) = mode{ ĉ^(1)(x), ĉ^(2)(x), ..., ĉ^(T)(x) }</div>
+        <div class="eq">P(c_k|x) = (1/T) Σ[t=1..T] 1(ĉ^(t)(x)=c_k)</div>
+        <div class="eq">Gini: G = 1 - Σ[k=1..K] p_k²</div>
+        <div class="eq">Split gain: ΔG = G_parent - (n_L/n)G_L - (n_R/n)G_R</div>
+        <div class="note">Meaning: robust multiclass routing with confidence scores for ORC/DI/HVAC/BLEND.</div>
+      </article>
+
+      <article class="card s">
+        <h2>Shared Preprocessing</h2>
+        <div class="eq">z_j = (x_j - μ_j) / σ_j</div>
+        <ul>
+          <li>Normalizes different sensor scales</li>
+          <li>Prevents high-range signals from dominating</li>
+          <li>Supports stable training for both subsystems</li>
+        </ul>
+      </article>
+
+      <article class="card m">
+        <h2>Evaluation Metrics</h2>
+        <div class="eq">MAE = (1/n) Σ |y_i - ŷ_i|</div>
+        <div class="eq">R² = 1 - [Σ(y_i-ŷ_i)² / Σ(y_i-ȳ)²]</div>
+        <div class="eq">Precision = TP/(TP+FP), Recall = TP/(TP+FN)</div>
+        <div class="eq">F1 = 2PR/(P+R)</div>
+        <div class="note">Meaning: A is judged by prediction error, B by routing classification quality.</div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
