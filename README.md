@@ -60,6 +60,9 @@ Most facilities still operate these decisions on static rules and periodic check
 ```text
 .
 |-- assets/
+|-- data/
+|   |-- bath_data.csv
+|   `-- heat_data.csv
 |-- docs/
 |   `-- reference/
 |-- outputs/
@@ -92,6 +95,51 @@ pip install -r requirements.txt
 python src/cirrus_model.py
 ```
 
+Data modes:
+
+```powershell
+# Auto mode (default): use CSVs if both exist, else synthetic
+python src/cirrus_model.py --mode auto
+
+# Force synthetic mode
+python src/cirrus_model.py --mode synthetic
+
+# Force real-data mode using defaults in data/
+python src/cirrus_model.py --mode real
+
+# Force real-data mode with custom paths
+python src/cirrus_model.py --mode real --bath-data data/bath_data.csv --heat-data data/heat_data.csv
+```
+
+If `--mode real` is used, both CSV files are required and validated before training.
+
+### 4) Required CSV schema
+
+Bath dataset (`bath_data.csv`) requires columns:
+
+- `ph`
+- `orp_mv`
+- `ion_ppm`
+- `turbidity`
+- `temp_c`
+- `lots_run`
+- `bath_age_hr`
+- `remaining_life_pct`
+
+Optional bath column:
+
+- `action` (auto-derived from `remaining_life_pct` if omitted)
+
+Heat dataset (`heat_data.csv`) requires columns:
+
+- `exhaust_temp_c`
+- `flow_rate_m3h`
+- `di_demand_kw`
+- `hvac_demand_kw`
+- `orc_capacity_pct`
+- `time_of_day_hr`
+- `routing`
+
 Expected outputs:
 
 - Console metrics for Subsystem A and B
@@ -101,10 +149,17 @@ Expected outputs:
 ## Technical Highlights
 
 - End-to-end ML pipeline for both subsystems
+- Synthetic and real-data execution modes
+- Schema validation for CSV-based real-data training
 - Synthetic dataset generation with domain-informed feature behavior
 - Model evaluation built into run flow
 - Feature-importance reporting for explainability
 - Multi-panel dashboard generation for presentation artifacts
+
+## Additional Documentation
+
+- Sensor hardware list and architecture block diagram: docs/cirrus_sensors_and_block_diagram.md
+- Poster-ready top-down diagram PNG: outputs/cirrus_block_diagram_poster.png
 
 ## Competition Notes
 

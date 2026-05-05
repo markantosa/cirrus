@@ -43,6 +43,7 @@ from sklearn.pipeline import Pipeline
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from pathlib import Path
+import argparse
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -51,6 +52,121 @@ np.random.seed(42)
 ROOT_DIR = Path(__file__).resolve().parents[1]
 OUTPUTS_DIR = ROOT_DIR / "outputs"
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR = ROOT_DIR / "data"
+
+BATH_REQUIRED_COLUMNS = [
+    "ph", "orp_mv", "ion_ppm", "turbidity", "temp_c",
+    "lots_run", "bath_age_hr", "remaining_life_pct"
+]
+
+HEAT_REQUIRED_COLUMNS = [
+    "exhaust_temp_c", "flow_rate_m3h", "di_demand_kw",
+    "hvac_demand_kw", "orc_capacity_pct", "time_of_day_hr", "routing"
+]
+
+
+def parse_args():
+    """Parse optional CSV paths for real-data mode."""
+    parser = argparse.ArgumentParser(
+        description="Run CIRRUS with synthetic data or user-provided CSV files."
+    )
+    parser.add_argument(
+        "--bath-data",
+        type=Path,
+        default=DATA_DIR / "bath_data.csv",
+        help="Path to bath subsystem CSV. Default: data/bath_data.csv",
+    )
+    parser.add_argument(
+        "--heat-data",
+        type=Path,
+        default=DATA_DIR / "heat_data.csv",
+        help="Path to heat subsystem CSV. Default: data/heat_data.csv",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["auto", "synthetic", "real"],
+        default="auto",
+        help=(
+            "Data mode: auto (use CSVs if both exist, else synthetic), "
+            "synthetic (force generated data), real (require CSVs)."
+        ),
+    )
+    parser.add_argument(
+        "--closed-loop-a",
+        action="store_true",
+        help="Enable Subsystem A closed-loop simulation (Sense -> Predict -> Decide -> Act).",
+    )
+    parser.add_argument(
+        "--loop-cycles",
+        type=int,
+        default=8,
+        help="Number of closed-loop control cycles to simulate for Subsystem A.",
+    )
+    parser.add_argument(
+        "--loop-interval-hr",
+        type=float,
+        default=1.0,
+        help="Hours between control cycles in Subsystem A closed-loop simulation.",
+    )
+    return parser.parse_args()
+
+
+def _validate_columns(df: pd.DataFrame, required_cols: list[str], dataset_name: str):
+    """Raise a readable error when required columns are missing."""
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"{dataset_name} CSV missing required columns: {missing}. "
+            f"Expected columns: {required_cols}"
+        )
+
+
+def load_real_data(bath_path: Path, heat_path: Path):
+    """Load and validate user-provided bath and heat datasets."""
+    if not bath_path.exists() or not heat_path.exists():
+        raise FileNotFoundError(
+            "Real mode requires both files to exist: "
+            f"bath={bath_path}, heat={heat_path}"
+        )
+
+    bath_df = pd.read_csv(bath_path)
+    heat_df = pd.read_csv(heat_path)
+
+    _validate_columns(bath_df, BATH_REQUIRED_COLUMNS, "Bath")
+    _validate_columns(heat_df, HEAT_REQUIRED_COLUMNS, "Heat")
+
+    # Standardize optional action field for consistency in reporting.
+    if "action" not in bath_df.columns:
+        bath_df["action"] = pd.cut(
+            bath_df["remaining_life_pct"],
+            bins=[-1, 20, 50, 101],
+            labels=["DUMP", "TOP-OFF", "CONTINUE"]
+        )
+
+    bath_df = bath_df.copy()
+    heat_df = heat_df.copy()
+    return bath_df, heat_df
+
+
+def load_data(mode: str, bath_path: Path, heat_path: Path):
+    """Resolve data source based on mode and file availability."""
+    if mode == "synthetic":
+        print("Generating synthetic fab sensor data...")
+        return generate_bath_data(n_samples=1200), generate_heat_data(n_samples=1200), "synthetic"
+
+    if mode == "real":
+        print(f"Loading real CSV data from {bath_path} and {heat_path}...")
+        bath_df, heat_df = load_real_data(bath_path, heat_path)
+        return bath_df, heat_df, "real"
+
+    # auto mode
+    if bath_path.exists() and heat_path.exists():
+        print(f"Auto mode: detected CSV files at {bath_path} and {heat_path}.")
+        bath_df, heat_df = load_real_data(bath_path, heat_path)
+        return bath_df, heat_df, "real"
+
+    print("Auto mode: CSV files not found for both subsystems. Falling back to synthetic data.")
+    return generate_bath_data(n_samples=1200), generate_heat_data(n_samples=1200), "synthetic"
 
 # =============================================================================
 # SECTION 1 — SYNTHETIC DATA GENERATION
@@ -238,6 +354,186 @@ def infer_action(remaining_life_pct: float) -> str:
         return "CONTINUE"
 
 
+def _bath_feature_vector(snapshot: dict) -> np.ndarray:
+    """Create a model-ready feature vector from a bath snapshot dict."""
+    fields = ["ph", "orp_mv", "ion_ppm", "turbidity", "temp_c", "lots_run", "bath_age_hr"]
+    return np.array([[snapshot[f] for f in fields]])
+
+
+def compute_activity_decay_rate(life_history: list[float], time_history_hr: list[float]) -> float:
+    """Estimate activity decay rate (% life loss per hour) from recent RUL history."""
+    if len(life_history) < 2:
+        return 0.0
+
+    x = np.array(time_history_hr[-4:], dtype=float)
+    y = np.array(life_history[-4:], dtype=float)
+
+    # Linear trend slope in %/hr. Negative slope means decreasing life.
+    slope = np.polyfit(x, y, 1)[0]
+    return max(0.0, -float(slope))
+
+
+def estimate_proxy_rul(snapshot: dict) -> float:
+    """
+    Sensor-physics proxy for bath health.
+    Used to stabilize closed-loop behavior when training data is very small.
+    """
+    ph_score = max(0.0, 1.0 - abs(snapshot["ph"] - 7.0) / 2.5)
+    orp_score = np.clip((snapshot["orp_mv"] - 250.0) / 420.0, 0.0, 1.0)
+    ion_score = np.clip(1.0 - snapshot["ion_ppm"] / 130.0, 0.0, 1.0)
+    turb_score = np.clip(1.0 - snapshot["turbidity"] / 30.0, 0.0, 1.0)
+    usage_score = np.clip(1.0 - snapshot["lots_run"] / 180.0, 0.0, 1.0)
+    age_score = np.clip(1.0 - snapshot["bath_age_hr"] / 90.0, 0.0, 1.0)
+
+    health_score = (
+        0.18 * ph_score +
+        0.20 * orp_score +
+        0.18 * ion_score +
+        0.14 * turb_score +
+        0.15 * usage_score +
+        0.15 * age_score
+    )
+    return float(np.clip(health_score * 100.0, 0.0, 100.0))
+
+
+def predictive_decision(remaining_life_pct: float, decay_rate_pct_per_hr: float, horizon_hr: float = 2.0) -> str:
+    """
+    Predictive trigger logic.
+    Uses projected near-future life instead of only current threshold crossing.
+    """
+    projected_life = remaining_life_pct - decay_rate_pct_per_hr * horizon_hr
+
+    if projected_life <= 20:
+        return "DUMP"
+    if projected_life <= 50:
+        return "TOP-OFF"
+    return "CONTINUE"
+
+
+def apply_subsystem_a_actuation(snapshot: dict, action: str, interval_hr: float) -> dict:
+    """Simulate physical actuation effects on bath chemistry and process counters."""
+    new_state = snapshot.copy()
+
+    # Base process load for each cycle (bath continues to service wafers).
+    new_state["lots_run"] = float(new_state["lots_run"] + np.random.randint(2, 6))
+    new_state["bath_age_hr"] = float(new_state["bath_age_hr"] + interval_hr)
+
+    if action == "CONTINUE":
+        # Natural degradation under ongoing operation.
+        new_state["ph"] = float(np.clip(new_state["ph"] - 0.07, 0, 14))
+        new_state["orp_mv"] = float(np.clip(new_state["orp_mv"] - 9.0, 100, 800))
+        new_state["ion_ppm"] = float(max(0.0, new_state["ion_ppm"] + 3.5))
+        new_state["turbidity"] = float(max(0.0, new_state["turbidity"] + 0.9))
+
+    elif action == "TOP-OFF":
+        # Micro-dosing: partial chemistry recovery without full replacement.
+        new_state["ph"] = float(np.clip(new_state["ph"] + 0.22, 0, 14))
+        new_state["orp_mv"] = float(np.clip(new_state["orp_mv"] + 30.0, 100, 800))
+        new_state["ion_ppm"] = float(max(0.0, new_state["ion_ppm"] * 0.82))
+        new_state["turbidity"] = float(max(0.0, new_state["turbidity"] * 0.84))
+
+    elif action == "DUMP":
+        # Full drain-refill: reset to near-fresh bath baseline.
+        new_state["ph"] = float(7.0 + np.random.normal(0, 0.05))
+        new_state["orp_mv"] = float(645 + np.random.normal(0, 8.0))
+        new_state["ion_ppm"] = float(max(1.0, 6 + np.random.normal(0, 1.0)))
+        new_state["turbidity"] = float(max(0.1, 0.8 + np.random.normal(0, 0.2)))
+        new_state["lots_run"] = float(np.random.randint(0, 3))
+        new_state["bath_age_hr"] = float(max(0.0, np.random.normal(0.2, 0.15)))
+
+    # Keep temperature close to operating point.
+    new_state["temp_c"] = float(np.clip(70 + np.random.normal(0, 0.6), 66, 74))
+    return new_state
+
+
+def log_fab_control_event(cycle: int, action: str, remaining_life_pct: float, decay_rate: float):
+    """Emit FMCS/SECS-GEM style event logs for integration storytelling."""
+    secs_event = {
+        "event": "CEID_BATH_CONTROL",
+        "cycle": cycle,
+        "action": action,
+        "rul_pct": round(remaining_life_pct, 2),
+        "decay_pct_per_hr": round(decay_rate, 3),
+    }
+    print(f"  [FMCS] Dispatch control command: {action}")
+    print(f"  [SECS/GEM] {secs_event}")
+
+
+def run_subsystem_a_closed_loop(
+    bath_model,
+    initial_snapshot: dict,
+    cycles: int = 8,
+    interval_hr: float = 1.0,
+    horizon_hr: float = 2.0,
+):
+    """
+    Closed-loop controller for Subsystem A.
+    Sense -> Predict -> Decide -> Act -> Re-sense -> Repeat
+    """
+    print("\n" + "=" * 60)
+    print("SUBSYSTEM A — CLOSED LOOP CONTROL SIMULATION")
+    print("  Loop: Sense -> Predict -> Decide -> Act -> Re-sense")
+    print("=" * 60)
+
+    state = initial_snapshot.copy()
+    t_hr = 0.0
+    life_history = []
+    time_history = []
+    logs = []
+
+    for cycle in range(1, cycles + 1):
+        # 1) Sense + predict
+        X = _bath_feature_vector(state)
+        model_rul = float(bath_model.predict(X)[0])
+        proxy_rul = estimate_proxy_rul(state)
+        rul = float(np.clip(0.65 * model_rul + 0.35 * proxy_rul, 0.0, 100.0))
+        life_history.append(rul)
+        time_history.append(t_hr)
+
+        # 2) Compute decay trend and predictive trigger
+        decay_rate = compute_activity_decay_rate(life_history, time_history)
+        action = predictive_decision(rul, decay_rate, horizon_hr=horizon_hr)
+        projected_life = rul - decay_rate * horizon_hr
+
+        print(f"\n  Cycle {cycle:02d} | t={t_hr:.1f}h")
+        print(f"    Model RUL       : {model_rul:6.2f}%")
+        print(f"    Proxy RUL       : {proxy_rul:6.2f}%")
+        print(f"    RUL now         : {rul:6.2f}% (blended)")
+        print(f"    Decay rate      : {decay_rate:6.3f}% per hour")
+        print(f"    Projected RUL   : {projected_life:6.2f}% (horizon={horizon_hr:.1f}h)")
+        print(f"    Decision        : {action}")
+
+        # 3) Actuate via FMCS/SECS-GEM integration point
+        log_fab_control_event(cycle, action, rul, decay_rate)
+
+        logs.append({
+            "cycle": cycle,
+            "time_hr": t_hr,
+            "rul_pct": rul,
+            "decay_rate_pct_per_hr": decay_rate,
+            "projected_rul_pct": projected_life,
+            "action": action,
+            "ph": state["ph"],
+            "orp_mv": state["orp_mv"],
+            "ion_ppm": state["ion_ppm"],
+            "turbidity": state["turbidity"],
+            "temp_c": state["temp_c"],
+            "lots_run": state["lots_run"],
+            "bath_age_hr": state["bath_age_hr"],
+        })
+
+        # 4) Re-sense after action effects in next control interval
+        state = apply_subsystem_a_actuation(state, action, interval_hr=interval_hr)
+        t_hr += interval_hr
+
+    logs_df = pd.DataFrame(logs)
+    loop_output = OUTPUTS_DIR / "subsystem_a_closed_loop_log.csv"
+    logs_df.to_csv(loop_output, index=False)
+    print(f"\n  Closed-loop log saved -> {loop_output.relative_to(ROOT_DIR)}")
+
+    return logs_df
+
+
 # =============================================================================
 # SECTION 3 — SUBSYSTEM B: HEAT CASCADE ROUTING MODEL
 # Architecture: StandardScaler → RandomForestClassifier
@@ -321,8 +617,7 @@ def run_cirrus_inference(bath_model, heat_model, le):
         "orc_capacity_pct": 72, "time_of_day_hr": 14.5
     }
 
-    bath_X     = np.array([[bath_snapshot[f] for f in
-                  ["ph","orp_mv","ion_ppm","turbidity","temp_c","lots_run","bath_age_hr"]]])
+    bath_X = _bath_feature_vector(bath_snapshot)
     heat_X     = np.array([[heat_snapshot[f] for f in
                   ["exhaust_temp_c","flow_rate_m3h","di_demand_kw",
                    "hvac_demand_kw","orc_capacity_pct","time_of_day_hr"]]])
@@ -533,16 +828,16 @@ def plot_cirrus_dashboard(
 # =============================================================================
 
 if __name__ == "__main__":
+    args = parse_args()
 
     print("\n╔══════════════════════════════════════════════════════════╗")
     print("║  CIRRUS — Integrated ML Platform  |  Team 28             ║")
     print("║  SEMICON SEA 2026 TECH Zoomers Challenge                 ║")
     print("╚══════════════════════════════════════════════════════════╝\n")
 
-    # Generate synthetic data
-    print("Generating synthetic fab sensor data...")
-    bath_df = generate_bath_data(n_samples=1200)
-    heat_df = generate_heat_data(n_samples=1200)
+    # Load real data or generate synthetic data
+    bath_df, heat_df, data_mode = load_data(args.mode, args.bath_data, args.heat_data)
+    print(f"Data mode: {data_mode}")
     print(f"  Bath dataset : {bath_df.shape}  |  Action dist: {bath_df['action'].value_counts().to_dict()}")
     print(f"  Heat dataset : {heat_df.shape}  |  Route dist : {heat_df['routing'].value_counts().to_dict()}\n")
 
@@ -552,6 +847,24 @@ if __name__ == "__main__":
 
     # Run integrated inference loop
     life_pct, action, routing_label = run_cirrus_inference(bath_model, heat_model, heat_le)
+
+    if args.closed_loop_a:
+        closed_loop_init = {
+            "ph": 6.2,
+            "orp_mv": 455.0,
+            "ion_ppm": 60.0,
+            "turbidity": 13.0,
+            "temp_c": 70.2,
+            "lots_run": 88.0,
+            "bath_age_hr": 44.0,
+        }
+        run_subsystem_a_closed_loop(
+            bath_model,
+            initial_snapshot=closed_loop_init,
+            cycles=max(2, args.loop_cycles),
+            interval_hr=max(0.25, args.loop_interval_hr),
+            horizon_hr=2.0,
+        )
 
     # Plot unified dashboard
     print("\nRendering CIRRUS dashboard...")
