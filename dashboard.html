@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIRRUS | Integrated Sustainability Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --card-bg: #161b22;
+            --accent-a: #00d4ff;
+            --accent-b: #ff6b35;
+            --text-main: #ffffff;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --success: #2ea043;
+            --warning: #d29922;
+            --danger: #f85149;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1rem 2rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo-group h1 {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(46, 160, 67, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(46, 160, 67, 0);
+            }
+        }
+
+        .presets {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-preset {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover {
+            background: var(--border);
+        }
+
+        .btn-preset.active {
+            border-color: var(--accent-a);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* --- Main Layout --- */
+        main {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            grid-template-rows: 1fr auto;
+            flex: 1;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            grid-row: 1 / 2;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* --- Controls --- */
+        .control-group {
+            margin-bottom: 2rem;
+        }
+
+        .control-group h2 {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sub-a-title {
+            color: var(--accent-a) !important;
+        }
+
+        .sub-b-title {
+            color: var(--accent-b) !important;
+        }
+
+        .slider-container {
+            margin-bottom: 1.25rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* --- HUD Cards --- */
+        .hud-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .hud-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-a {
+            border-left: 4px solid var(--accent-a);
+        }
+
+        .card-b {
+            border-left: 4px solid var(--accent-b);
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 1.5rem;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 12;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: var(--accent-a);
+            stroke-width: 12;
+            stroke-dasharray: 565.48;
+            /* 2 * PI * 90 */
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 0.8s ease-out, stroke 0.5s;
+            stroke-linecap: round;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .gauge-unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: block;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .status-continue {
+            background: rgba(46, 160, 67, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-topoff {
+            background: rgba(210, 153, 34, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-dump {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            animation: glow-red 2s infinite;
+        }
+
+        @keyframes glow-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 15px 5px rgba(248, 81, 73, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(248, 81, 73, 0);
+            }
+        }
+
+        .drivers {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .driver-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.25rem;
+        }
+
+        .routing-display {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .route-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: var(--accent-b);
+            opacity: 0.15;
+            transition: width 0.5s ease-out;
+        }
+
+        .route-label {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .route-item.active {
+            border-color: var(--accent-b);
+            background: rgba(255, 107, 53, 0.1);
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.2);
+            animation: pulse-orange 2s infinite;
+        }
+
+        @keyframes pulse-orange {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- Footer Scorecard --- */
+        .scorecard {
+            grid-column: 1 / 3;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-val {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-a);
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Responsive slider thumb styling */
+        input[type=range]::-webkit-slider-runnable-track {
+            background: var(--border);
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: white;
+            margin-top: -6px;
+            border: 2px solid var(--accent-a);
+        }
+
+        .sub-b-controls input[type=range]::-webkit-slider-thumb {
+            border-color: var(--accent-b);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-group">
+            <h1>CIRRUS</h1>
+            <div class="tagline">Resource Recovery & ML Intelligence</div>
+        </div>
+
+        <div class="status-indicator">
+            <div class="pulse-dot"></div>
+            <span>SIMULATION ACTIVE</span>
+        </div>
+
+        <div class="presets">
+            <button class="btn-preset active" onclick="setScenario('normal')">Normal Ops</button>
+            <button class="btn-preset" onclick="setScenario('fault')">Process Fault</button>
+            <button class="btn-preset" onclick="setScenario('peak')">Peak Demand</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="sidebar">
+            <div class="control-group">
+                <h2 class="sub-a-title">Subsystem A: Wet Bath</h2>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>pH Level</span> <span id="val-ph">7.0</span></div>
+                    <input type="range" id="input-ph" min="0" max="14" step="0.1" value="7" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>ORP (mV)</span> <span id="val-orp">650</span></div>
+                    <input type="range" id="input-orp" min="100" max="800" step="10" value="650" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>Ion Conc (ppm)</span> <span id="val-ion">5</span></div>
+                    <input type="range" id="input-ion" min="0" max="150" step="1" value="5" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>Turbidity (NTU)</span> <span id="val-turb">0.5</span></div>
+                    <input type="range" id="input-turb" min="0" max="50" step="0.5" value="0.5" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>Lots Processed</span> <span id="val-lots">0</span></div>
+                    <input type="range" id="input-lots" min="0" max="200" step="1" value="0" oninput="updateUI()">
+                </div>
+            </div>
+
+            <div class="control-group sub-b-controls">
+                <h2 class="sub-b-title">Subsystem B: Heat Cascade</h2>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>Exhaust Temp (°C)</span> <span id="val-temp">400</span></div>
+                    <input type="range" id="input-temp" min="100" max="1200" step="10" value="400" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>Flow Rate (m³/hr)</span> <span id="val-flow">250</span></div>
+                    <input type="range" id="input-flow" min="50" max="500" step="10" value="250" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>DI Demand (kW)</span> <span id="val-di">100</span></div>
+                    <input type="range" id="input-di" min="10" max="200" step="5" value="100" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>HVAC Demand (kW)</span> <span id="val-hvac">200</span></div>
+                    <input type="range" id="input-hvac" min="50" max="400" step="10" value="200" oninput="updateUI()">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header"><span>ORC Capacity (%)</span> <span id="val-orc">50</span></div>
+                    <input type="range" id="input-orc" min="10" max="100" step="5" value="50" oninput="updateUI()">
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Card A -->
+            <div class="hud-card card-a">
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 200 200">
+                        <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
+                        <circle id="gauge-fill" class="gauge-fill" cx="100" cy="100" r="90"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <span id="life-val" class="gauge-value">100</span>
+                        <span class="gauge-unit">% LIFE</span>
+                    </div>
+                </div>
+                <div id="status-badge" class="status-badge status-continue">CONTINUE</div>
+                <div class="drivers">
+                    <div class="driver-item"><span>Ion Accumulation</span> <span>2.4%</span></div>
+                    <div class="driver-item"><span>Bath Oxidation</span> <span>1.1%</span></div>
+                </div>
+            </div>
+
+            <!-- Card B -->
+            <div class="hud-card card-b">
+                <h3 style="color: var(--accent-b); margin-bottom: 1.5rem; font-size: 0.9rem;">ROUTING DECISION</h3>
+                <div class="routing-display">
+                    <div class="route-item" id="route-orc">
+                        <div class="route-bar" id="bar-orc"></div>
+                        <div class="route-label"><span>ORC GENERATION</span> <span id="prob-orc">0%</span></div>
+                    </div>
+                    <div class="route-item" id="route-di">
+                        <div class="route-bar" id="bar-di"></div>
+                        <div class="route-label"><span>DI PRE-HEAT</span> <span id="prob-di">0%</span></div>
+                    </div>
+                    <div class="route-item" id="route-hvac">
+                        <div class="route-bar" id="bar-hvac"></div>
+                        <div class="route-label"><span>HVAC SUPPLY</span> <span id="prob-hvac">0%</span></div>
+                    </div>
+                    <div class="route-item" id="route-blend">
+                        <div class="route-bar" id="bar-blend"></div>
+                        <div class="route-label"><span>SYSTEM BLEND</span> <span id="prob-blend">0%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scorecard">
+                <div class="score-item">
+                    <span id="score-chem" class="score-val">0</span>
+                    <span class="score-label">Chemicals Saved (L)</span>
+                </div>
+                <div class="score-item">
+                    <span id="score-energy" class="score-val">0</span>
+                    <span class="score-label">Thermal Recovered (kW)</span>
+                </div>
+                <div class="score-item">
+                    <span id="score-cost" class="score-val">$0</span>
+                    <span class="score-label">Est. Savings ($/day)</span>
+                </div>
+                <div class="score-item">
+                    <span id="score-co2" class="score-val">0</span>
+                    <span class="score-label">CO₂ Avoided (kg)</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function setScenario(type) {
+            // Update button states
+            document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+            if (event) {
+                event.target.classList.add('active');
+            }
+
+            const inputs = {
+                'normal': { ph: 6.8, orp: 620, ion: 15, turb: 1.2, lots: 45, temp: 450, flow: 320, di: 120, hvac: 180, orc: 80 },
+                'fault': { ph: 4.2, orp: 280, ion: 110, turb: 38.5, lots: 165, temp: 150, flow: 120, di: 40, hvac: 350, orc: 20 },
+                'peak': { ph: 6.2, orp: 550, ion: 40, turb: 5.5, lots: 85, temp: 950, flow: 480, di: 180, hvac: 150, orc: 90 }
+            };
+
+            const s = inputs[type];
+            document.getElementById('input-ph').value = s.ph;
+            document.getElementById('input-orp').value = s.orp;
+            document.getElementById('input-ion').value = s.ion;
+            document.getElementById('input-turb').value = s.turb;
+            document.getElementById('input-lots').value = s.lots;
+            document.getElementById('input-temp').value = s.temp;
+            document.getElementById('input-flow').value = s.flow;
+            document.getElementById('input-di').value = s.di;
+            document.getElementById('input-hvac').value = s.hvac;
+            document.getElementById('input-orc').value = s.orc;
+
+            updateUI();
+        }
+
+        function updateUI() {
+            // 1. Get Values
+            const ph = parseFloat(document.getElementById('input-ph').value);
+            const orp = parseFloat(document.getElementById('input-orp').value);
+            const ion = parseFloat(document.getElementById('input-ion').value);
+            const turb = parseFloat(document.getElementById('input-turb').value);
+            const lots = parseFloat(document.getElementById('input-lots').value);
+
+            const temp = parseFloat(document.getElementById('input-temp').value);
+            const flow = parseFloat(document.getElementById('input-flow').value);
+            const di = parseFloat(document.getElementById('input-di').value);
+            const hvac = parseFloat(document.getElementById('input-hvac').value);
+            const orc = parseFloat(document.getElementById('input-orc').value);
+
+            // Update Labels
+            document.getElementById('val-ph').innerText = ph.toFixed(1);
+            document.getElementById('val-orp').innerText = orp;
+            document.getElementById('val-ion').innerText = ion;
+            document.getElementById('val-turb').innerText = turb.toFixed(1);
+            document.getElementById('val-lots').innerText = lots;
+            document.getElementById('val-temp').innerText = temp;
+            document.getElementById('val-flow').innerText = flow;
+            document.getElementById('val-di').innerText = di;
+            document.getElementById('val-hvac').innerText = hvac;
+            document.getElementById('val-orc').innerText = orc;
+
+            // 2. Inference Subsystem A (Wet Bath)
+            // Mimicking the Python logic: decay = (lots/200)^1.3 + (age/100)^1.1
+            const decayFactor = Math.pow(lots / 200, 1.3) + (ion / 150) * 0.5 + (turb / 50) * 0.3;
+            let lifePct = Math.max(0, 100 - (decayFactor * 80));
+
+            // Manual override for extreme pH/ORP
+            if (ph < 4 || ph > 10) lifePct *= 0.7;
+            if (orp < 300) lifePct *= 0.6;
+
+            lifePct = Math.round(lifePct);
+
+            // Update Gauge
+            const circle = document.getElementById('gauge-fill');
+            const offset = 565.48 - (lifePct / 100) * 565.48;
+            circle.style.strokeDashoffset = offset;
+            document.getElementById('life-val').innerText = lifePct;
+
+            const badge = document.getElementById('status-badge');
+            badge.className = 'status-badge';
+            if (lifePct > 50) {
+                badge.innerText = 'CONTINUE';
+                badge.classList.add('status-continue');
+                circle.style.stroke = 'var(--success)';
+            } else if (lifePct > 20) {
+                badge.innerText = 'TOP-OFF';
+                badge.classList.add('status-topoff');
+                circle.style.stroke = 'var(--warning)';
+            } else {
+                badge.innerText = 'DUMP';
+                badge.classList.add('status-dump');
+                circle.style.stroke = 'var(--danger)';
+            }
+
+            // 3. Inference Subsystem B (Heat Cascade)
+            let probabilities = { orc: 5, di: 5, hvac: 5, blend: 85 };
+
+            if (temp > 700 && orc > 50) {
+                probabilities = { orc: 92, di: 3, hvac: 2, blend: 3 };
+            } else if (temp > 300 && temp <= 700 && di > 100) {
+                probabilities = { orc: 5, di: 88, hvac: 4, blend: 3 };
+            } else if (temp <= 300 && hvac > 200) {
+                probabilities = { orc: 2, di: 5, hvac: 90, blend: 3 };
+            } else {
+                probabilities.blend = 70 + Math.random() * 10;
+                probabilities.orc = (temp / 1200) * 20;
+                probabilities.di = (di / 200) * 15;
+                probabilities.hvac = (hvac / 400) * 15;
+            }
+
+            updateRoute('orc', probabilities.orc);
+            updateRoute('di', probabilities.di);
+            updateRoute('hvac', probabilities.hvac);
+            updateRoute('blend', probabilities.blend);
+
+            // 4. Sustainability Scorecard
+            const chemSaved = Math.floor((100 - lifePct) * 1.5);
+            const energyRec = Math.floor((temp * flow) / 1000);
+            const costSaved = Math.floor(chemSaved * 2 + energyRec * 0.12);
+            const co2Avoided = (energyRec * 0.4).toFixed(1);
+
+            document.getElementById('score-chem').innerText = chemSaved;
+            document.getElementById('score-energy').innerText = energyRec;
+            document.getElementById('score-cost').innerText = '$' + costSaved;
+            document.getElementById('score-co2').innerText = co2Avoided;
+        }
+
+        function updateRoute(id, prob) {
+            const item = document.getElementById('route-' + id);
+            const bar = document.getElementById('bar-' + id);
+            const label = document.getElementById('prob-' + id);
+
+            bar.style.width = prob + '%';
+            label.innerText = Math.round(prob) + '%';
+
+            if (prob > 50) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        }
+
+        // Init
+        updateUI();
+    </script>
+
+</body>
+
+</html>
