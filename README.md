@@ -68,6 +68,7 @@ Most facilities still operate these decisions on static rules and periodic check
 |-- outputs/
 |-- src/
 |   `-- cirrus_model.py
+|-- dashboard.html
 |-- .gitignore
 |-- LICENSE
 |-- README.md
@@ -110,6 +111,26 @@ python src/cirrus_model.py --mode real
 # Force real-data mode with custom paths
 python src/cirrus_model.py --mode real --bath-data data/bath_data.csv --heat-data data/heat_data.csv
 ```
+
+### 4) Interactive Simulation Dashboard
+
+For live demonstrations and booth environments, use the **CIRRUS Interactive Dashboard**:
+
+- **Location:** `dashboard.html` (Single-file, offline-first)
+- **Features:** 
+  - Live sliders for Subsystem A & B sensor simulation.
+  - Real-time ML inference logic replicated in JavaScript.
+  - Sustainability scorecard (Chemicals, Energy, Cost, CO2).
+  - **Mobile Access:** Includes a built-in QR code generator to view the dashboard on any mobile device on the same network.
+
+**To run the Interactive Dashboard:**
+1. Open `dashboard.html` directly in any modern browser.
+2. Alternatively, run the local server for mobile support:
+   ```powershell
+   # Start the simulation server
+   python -m http.server 8080
+   ```
+3. Open `http://localhost:8080/dashboard.html` and click **"Mobile Link"** to scan the QR code.
 
 If `--mode real` is used, both CSV files are required and validated before training.
 
