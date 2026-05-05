@@ -1,0 +1,315 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Team 28//SEMICON Bootcamp 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Team 28 - SEMICON Bootcamp 2026
+X-WR-TIMEZONE:Asia/Kuala_Lumpur
+
+BEGIN:VEVENT
+UID:team28-20260504-1100-registration@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260504T110000
+DTEND;TZID=Asia/Kuala_Lumpur:20260504T130000
+SUMMARY:Day 0 - Arrival and Registration (ASEM)
+LOCATION:ASEM, CoPlace 9 (Basement B1 entrance, Level 2)
+DESCRIPTION:Team 28 leader: ensure full-team check-in and attendance tracking.
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260504-1300-lunch@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260504T130000
+DTEND;TZID=Asia/Kuala_Lumpur:20260504T140000
+SUMMARY:Day 0 - Lunch
+LOCATION:ASEM, CoPlace 9 (Basement B1 entrance, Level 2)
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260504-1400-welcome@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260504T140000
+DTEND;TZID=Asia/Kuala_Lumpur:20260504T173000
+SUMMARY:Day 0 - Welcome Program
+LOCATION:ASEM, CoPlace 9 (Basement B1 entrance, Level 2)
+DESCRIPTION:Includes opening remarks, intro, icebreakers, and soft skills.
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260504-1830-dinner-networking@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260504T183000
+DTEND;TZID=Asia/Kuala_Lumpur:20260504T203000
+SUMMARY:Day 0 - Dinner and Networking
+LOCATION:Cyberview Resort, Cyberjaya
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260504-2030-return-hostel@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260504T203000
+DTEND;TZID=Asia/Kuala_Lumpur:20260504T213000
+SUMMARY:Day 0 - Return to Hostel
+LOCATION:UKM Hostel or Bangi Resort Hotel
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-0815-report-lobby@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T081500
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T084000
+SUMMARY:Day 1 - Report to Lobby (Pickup)
+LOCATION:Bangi Resort Hotel Lobby, Bandar Baru Bangi
+DESCRIPTION:Leader action: confirm everyone is on transport.
+BEGIN:VALARM
+TRIGGER:-PT20M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-0900-ukm-program@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T090000
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T123000
+SUMMARY:Day 1 - UKM Morning Program and Mentor Session
+LOCATION:Universiti Kebangsaan Malaysia, DK2 Level 1 FKAB Academic Building
+DESCRIPTION:Includes industry overview, panel, and meet-your-mentor.
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-1230-lunch@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T123000
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T133000
+SUMMARY:Day 1 - Lunch
+LOCATION:Universiti Kebangsaan Malaysia (UKM), Bangi
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-1400-industrial-visit@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T140000
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T170000
+SUMMARY:Day 1 - Industrial Visit (onsemi and MIMOS, TBC)
+LOCATION:TBC
+DESCRIPTION:Site rules apply: covered shoes, no shorts/slippers, no photos.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-1900-project-discussion@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T190000
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T230000
+SUMMARY:Day 1 - Team Project Discussion (Poster Prep)
+LOCATION:UKM Hostel or Bangi Resort Hotel
+DESCRIPTION:Leader action: finalize storyline and assign presenters.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260505-2359-poster-deadline@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260505T235000
+DTEND;TZID=Asia/Kuala_Lumpur:20260505T235900
+SUMMARY:Deadline - Poster Submission (A1)
+LOCATION:Online Submission
+DESCRIPTION:Hard deadline 23:59. Late submissions may be disqualified.
+BEGIN:VALARM
+TRIGGER:-PT60M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-0745-depart-mitec@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T074500
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T083000
+SUMMARY:Day 2 - Depart to MITEC
+LOCATION:UKM or Bangi Resort pickup point to MITEC
+BEGIN:VALARM
+TRIGGER:-PT20M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-0830-breakfast-attendance@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T083000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T100000
+SUMMARY:Day 2 - Attendance and Breakfast
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-1000-techidol@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T100000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T123000
+SUMMARY:Day 2 - TechIDOL
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-1230-lunch@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T123000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T140000
+SUMMARY:Day 2 - Lunch
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-1430-poster-presentation@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T143000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T155000
+SUMMARY:Team 28 - Poster Presentation Slot
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+DESCRIPTION:10 min presentation + 5 min Q&A.
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-1730-grad-dinner@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T173000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T193000
+SUMMARY:Day 2 - Graduation Dinner and Results
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-2000-top5-slide-prep@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T200000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T230000
+SUMMARY:Day 2 - Top 5 Slide Prep (If Shortlisted)
+LOCATION:UKM Hostel or Bangi Resort Hotel
+DESCRIPTION:Prepare final deck and backup on USB.
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260506-2359-slide-deadline@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260506T235000
+DTEND;TZID=Asia/Kuala_Lumpur:20260506T235900
+SUMMARY:Deadline - Final Slide Submission (Top 5)
+LOCATION:Online Submission
+DESCRIPTION:Hard deadline 23:59 for Top 5 teams.
+BEGIN:VALARM
+TRIGGER:-PT60M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-PT15M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-0745-checkout@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T074500
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T080000
+SUMMARY:Day 3 - Checkout
+LOCATION:UKM Hostel or Bangi Resort Hotel
+BEGIN:VALARM
+TRIGGER:-PT20M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-0800-depart-mitec@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T080000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T090000
+SUMMARY:Day 3 - Depart to MITEC
+LOCATION:UKM or Bangi Resort pickup point to MITEC
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-0900-breakfast-attendance@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T090000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T094500
+SUMMARY:Day 3 - Attendance and Breakfast
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-1000-final-competition@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T100000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T123000
+SUMMARY:TECH Zoomers Final Competition (Top 5)
+LOCATION:MITEC MAINStage, Malaysia International Trade and Exhibition Centre, Kuala Lumpur
+DESCRIPTION:Only Top 5 teams present final slides.
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-1230-lunch@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T123000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T140000
+SUMMARY:Day 3 - Lunch and Free Time
+LOCATION:Malaysia International Trade and Exhibition Centre (MITEC), Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-1400-talentconnect@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T140000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T163000
+SUMMARY:TalentCONNECT
+LOCATION:MITEC MAINStage, Malaysia International Trade and Exhibition Centre, Kuala Lumpur
+END:VEVENT
+
+BEGIN:VEVENT
+UID:team28-20260507-1630-dismissal@semicon
+DTSTAMP:20260504T000000Z
+DTSTART;TZID=Asia/Kuala_Lumpur:20260507T163000
+DTEND;TZID=Asia/Kuala_Lumpur:20260507T173000
+SUMMARY:Dismissal and Departure
+LOCATION:MITEC, Kuala Lumpur (to KLIA2 or KL Sentral)
+DESCRIPTION:Foreign students to KLIA2, local students to KL Sentral.
+END:VEVENT
+
+END:VCALENDAR

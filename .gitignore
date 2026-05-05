@@ -1,0 +1,33 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter / Notebook
+.ipynb_checkpoints/
+
+# Environment / OS
+.env
+.DS_Store
+Thumbs.db
+
+# Build / Distribution
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Local generated artifacts
+outputs/*.png
+outputs/*.jpg
+outputs/*.jpeg
+outputs/*.svg
+outputs/*.pdf

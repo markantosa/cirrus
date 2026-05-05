@@ -1,0 +1,154 @@
+Challenge 
+Statements
+SEMICON Southeast Asia 2026
+Malaysia International Trade and Exhibition Centre | Kuala Lumpur
+Date: 4 - 7 May 2026
+
+Challenge Statements
+Company Challenge Statement Mentors
+AI Enabled Real Time Safety & Compliance Detection in the 
+Semiconductor Ecosystem
+• Vaishnav Subramanian
+• Ramesh, Akhilass
+Building a Resilient and Sustainable Future for Semiconductor 
+Manufacturing
+• Cao Wei Zhong
+• Daniel Soon Chik Chean
+Challenge Statement: Thermal Precision by Design
+• Tan Jun Ji
+• Calvin Chai
+• Vincent Lai
+Packaging Reliability Risk Identification • Mohamad Zainudeen Bin Moideen
+• Jothisvaran Kumaramohgan
+The "Invisible" Parasitics Problem • Yuzman Bin Yusoff (SMD)
+• Derrick Kho (Melexis)
+
+
+AI Enabled Real Time Safety & Compliance Detection in 
+the Semiconductor Ecosystem
+The semiconductor industry operates across a complex ecosystem of upstream and downstream partners, including equipment suppliers, logistics 
+providers, manufacturing fabs, and outsourced assembly and test facilities. Across these environments, safety and compliance critical activities (e.g. 
+vehicle docking, material handling) occur frequently and often rely on manual checks or post incident review. With high traffic, multiple stakeholders, 
+and varying site conditions, real time visibility into safety compliance remains limited, despite the widespread availability of cameras and sensors.
+Many safety and operational compliance checks in semiconductor operations are manual and labor intensive, reactive rather than preventive and 
+difficult to enforce consistently across sites and partners. This creates gaps in early detection of unsafe or non compliant conditions, increasing risk to 
+people, assets, and operations.
+Design a computer vision-based solution that:
+• Uses camera input to detect safety or compliance conditions in real time
+• Classifies compliant vs. non compliant scenarios under varying environments
+• Triggers timely alerts or flags when violations are detected
+• Can be conceptually applied across fab, logistics, supplier, or test environments
+Desired Outcome is a proposed AI / computer vision approach that:
+• Improves real time detection of safety or compliance issues
+• Reduces reliance on manual monitoring
+• Can scale across multiple partners in the semiconductor value chain
+• Demonstrates practical applicability in an industrial environment
+ 
+How can computer vision be used to improve real time detection of safety or compliance conditions across the semiconductor industry’s complex 
+ecosystem, enabling earlier intervention and safer operations?
+
+Building a Resilient and Sustainable Future for 
+Semiconductor Manufacturing
+Semiconductor wafer fabs face mounting sustainability challenges due to heavy water usage and high energy demand, making efficient resource 
+utilization essential as many facilities operate in water-stressed regions. Implementing optimized processes  and cleaner energy sources helps reduce 
+waste and environmental burden.
+Material sustainability is equally critical, as fabrication relies on hazardous chemicals and fluorinated gases; industry efforts now prioritize safer 
+alternatives, material substitution, and lower-emission options to minimize health risks and ecological impact.
+Protecting worker well-being requires robust safety systems, strict chemical-handling controls, and responsible waste-disposal practices to prevent 
+exposure and mitigate contamination throughout the fab’s lifecycle.
+The project should focus on reducing waste through effective reuse and recycling, improving water and energy efficiency, and identifying safer, 
+sustainable material replacements. 
+It should also explore innovative technologies that close current process gaps—such as advanced recovery systems, low-impact materials, or improved 
+manufacturing methods—to support long-term environmental performance and operational sustainability
+
+
+Thermal Precision by Design
+Semiconductor manufacturing demands extreme precision, consistency, and repeatability. In many critical thermal processes, the furnace 
+is not simply a heating chamber. It is a process enabler that directly influences film quality, material properties, defectivity, yield, and 
+downstream reliability. Even small variations in temperature distribution or cure behavior can lead to non-uniform process outcomes 
+across wafers, across lots, and across time.
+Achieving thermal uniformity is not only a hardware problem, but a system-level engineering challenge 
+involving heat transfer, process conditions, equipment behavior, sensing strategy, data interpretation, and 
+process optimization. Likewise, cure profile optimization is not just about reaching a target temperature. It is 
+about controlling the full thermal history experienced by the wafer or material so that the intended physical 
+and chemical transformation is achieved consistently, efficiently, and safely.
+This challenge invites you to think like semiconductor process and equipment engineers. Using your 
+knowledge, analytical skills, creativity, and available resources, you will study how a furnace system, can be 
+better understood and improved to achieve tighter thermal uniformity and a more optimized cure profile. 
+Your task is to bridge engineering theory with practical implementation and propose solutions that are 
+technically sound, data-driven, and realistic for an actual semiconductor manufacturing setting.
+
+
+Packaging Reliability Risk Identification
+Packaging-related reliability failures are often detected only during stress testing or after products are released, leading to high cost and delayed 
+corrective action. Current screening methods are largely reactive and do not use manufacturing process data.
+Problem Statement:
+How can a data-driven tool predict packaging reliability risk early using manufacturing process data?
+Focus Area:
+Reliability Engineering / Predictive Analytics
+
+
+The "Invisible" Parasitics Problem
+Derived from: Why "Perfect" Schematics Fail in the Real World. 
+The primary problem students must resolve is the gap between idealized simulation and physical implementation. In a schematic, a line is a perfect 
+conductor with zero resistance or interference. In reality, as frequencies increase and components shrink, those lines gain physical properties that the 
+student didn't "draw.“
+The Student’s Task: 
+Account for Parasitics: How do you compensate for the unintended resistance (R), inductance (L), and capacitance (C) that appear simply because two 
+traces are close together or too long?
+Thermal Management: How do you rearrange a layout so that "hot" components don't cook their "neighbors," even if the schematic says they are 
+connected correctly?
+Bridging the Gap: Moving from "does it work in the software?" to "will it survive the fabrication process?"
+
+Challenge Statement
+23 7 12
+9 25 19
+5 8 6
+29 10
+21 27 16
+3 28
+20 14 24
+1 30
+22 4 15
+13 11
+26
+2 18 17
+
+
+Presentation
+6-May | 14:30 – 15:50h
+MITEC
+Poster Presentation
+• 10-min Poster Presentation (Present your best 
+idea within the time given)
+• 5-min Q&A
+• Coordinate amongst your teammates
+Judging Criteria
+• Strength of idea
+• Commercial Viability
+• Teamwork
+• Presentation7-May | 10:00 – 12:30h
+MITEC | MAINStage
+Slides Presentation (Top 5)
+• 10-min Slides Presentation 
+• 10-min Q&A
+• Coordinate amongst your teammates
+• Save your presentation slides on a USB drive 
+as a backup
+
+Bootcamp Prizes
+1st Prize
+• MYR 4500 Cash Prize
+2nd  Prize 3rd Prize
+• MYR 3000 Cash Prize • MYR 2000 Cash Prize
+Consolation Prize
+Gift Set
+
+
+
+
+Malaysia International Trade and Exhibition Centre | Kuala Lumpur
+May 4 -7, 2026
+the 
+Event!
+SEMICON Southeast Asia 2026
