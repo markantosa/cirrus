@@ -31,3 +31,4 @@ outputs/*.jpg
 outputs/*.jpeg
 outputs/*.svg
 outputs/*.pdf
+outputs/*.csv
