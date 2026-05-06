@@ -659,20 +659,64 @@
             }
 
             // 3. Inference Subsystem B (Heat Cascade)
-            let probabilities = { orc: 5, di: 5, hvac: 5, blend: 85 };
+            // Dynamic softmax-based routing model.
+            // Each route gets a continuous affinity score computed from
+            // sigmoid-shaped functions centered on the real physics thresholds.
+            // Scores are then softmax-normalised so they sum to 100%,
+            // mimicking a real RandomForestClassifier confidence distribution.
 
-            if (temp > 700 && orc > 50) {
-                probabilities = { orc: 92, di: 3, hvac: 2, blend: 3 };
-            } else if (temp > 300 && temp <= 700 && di > 100) {
-                probabilities = { orc: 5, di: 88, hvac: 4, blend: 3 };
-            } else if (temp <= 300 && hvac > 200) {
-                probabilities = { orc: 2, di: 5, hvac: 90, blend: 3 };
-            } else {
-                probabilities.blend = 70 + Math.random() * 10;
-                probabilities.orc = (temp / 1200) * 20;
-                probabilities.di = (di / 200) * 15;
-                probabilities.hvac = (hvac / 400) * 15;
+            // ── Helper: sigmoid squash ──────────────────────────────────────
+            // Returns 0→1 as x crosses the threshold; steepness controls sharpness.
+            function sigmoid(x, threshold, steepness) {
+                return 1 / (1 + Math.exp(-steepness * (x - threshold)));
             }
+
+            // ── ORC affinity ────────────────────────────────────────────────
+            // Driven by high exhaust temp (>700°C) AND available ORC headroom.
+            // Both must be satisfied — combined multiplicatively.
+            const orcTempScore  = sigmoid(temp, 700, 0.008);   // ramps up sharply above 700°C
+            const orcCapScore   = sigmoid(orc,  50,  0.10);    // ramps up above 50% capacity
+            const orcAffinity   = orcTempScore * orcCapScore * 10;
+
+            // ── DI Pre-heat affinity ────────────────────────────────────────
+            // Best in the mid-temperature band (300–700°C) with high DI demand.
+            // Bell-shaped in temperature space: falls off at both extremes.
+            const diTempBell    = sigmoid(temp, 300, 0.010) * (1 - sigmoid(temp, 700, 0.010));
+            const diDemandScore = sigmoid(di,   100, 0.030);   // ramps up above 100 kW
+            const diAffinity    = diTempBell * diDemandScore * 12;
+
+            // ── HVAC affinity ───────────────────────────────────────────────
+            // Best at low exhaust temperature (≤300°C) with high HVAC demand.
+            const hvacTempScore   = 1 - sigmoid(temp, 300, 0.010); // high when temp is low
+            const hvacDemandScore = sigmoid(hvac, 200, 0.015);     // ramps up above 200 kW
+            const hvacAffinity    = hvacTempScore * hvacDemandScore * 10;
+
+            // ── BLEND affinity ──────────────────────────────────────────────
+            // Baseline presence: strongest when no single route dominates.
+            // Its score is inversely proportional to the peak single-route score.
+            const peakSingle    = Math.max(orcAffinity, diAffinity, hvacAffinity);
+            const blendAffinity = Math.max(0.5, 3.5 - peakSingle * 0.6);
+
+            // ── Softmax normalisation ───────────────────────────────────────
+            // Convert raw affinity scores to a probability distribution.
+            // Temperature parameter T controls sharpness (lower = more decisive).
+            const T = 1.0;
+            const expOrc   = Math.exp(orcAffinity   / T);
+            const expDi    = Math.exp(diAffinity    / T);
+            const expHvac  = Math.exp(hvacAffinity  / T);
+            const expBlend = Math.exp(blendAffinity / T);
+            const expSum   = expOrc + expDi + expHvac + expBlend;
+
+            // ── Sensor jitter (±1–2%) ───────────────────────────────────────
+            // Simulates real-world sensor noise so values aren't perfectly static.
+            function jitter() { return (Math.random() - 0.5) * 2.5; }
+
+            const probabilities = {
+                orc:   Math.min(99, Math.max(1, (expOrc   / expSum) * 100 + jitter())),
+                di:    Math.min(99, Math.max(1, (expDi    / expSum) * 100 + jitter())),
+                hvac:  Math.min(99, Math.max(1, (expHvac  / expSum) * 100 + jitter())),
+                blend: Math.min(99, Math.max(1, (expBlend / expSum) * 100 + jitter())),
+            };
 
             updateRoute('orc', probabilities.orc);
             updateRoute('di', probabilities.di);
