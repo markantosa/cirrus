@@ -19,6 +19,13 @@ This repository contains a fully runnable demo using placeholder synthetic data 
 - Challenge: Building a Resilient and Sustainable Future for Semiconductor Manufacturing
 - Mentors: Cao Wei Zhong, Daniel Soon Chik Chean
 
+## Project Photos
+
+<p align="center">
+  <img src="Photos/CIRRUS%20Poster.png" alt="CIRRUS Poster" width="46%" />
+  <img src="Photos/Exhibition%20Day.jpeg" alt="CIRRUS Exhibition Day" width="46%" />
+</p>
+
 ## Problem Framing
 
 Semiconductor fabs face two persistent operational inefficiencies:
@@ -66,6 +73,9 @@ Most facilities still operate these decisions on static rules and periodic check
 |-- docs/
 |   `-- reference/
 |-- outputs/
+|-- Photos/
+|   |-- CIRRUS Poster.png
+|   `-- Exhibition Day.jpeg
 |-- src/
 |   `-- cirrus_model.py
 |-- dashboard.html

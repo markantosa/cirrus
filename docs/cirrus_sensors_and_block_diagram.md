@@ -1,5 +1,12 @@
 # CIRRUS Sensor Hardware and System Block Diagram
 
+## Project Photos
+
+<p align="center">
+    <img src="../Photos/CIRRUS%20Poster.png" alt="CIRRUS Poster" width="46%" />
+    <img src="../Photos/Exhibition%20Day.jpeg" alt="CIRRUS Exhibition Day" width="46%" />
+</p>
+
 ## 1) Sensor Hardware Requirements
 
 ### Subsystem A: Wet Bath Lifecycle Extension

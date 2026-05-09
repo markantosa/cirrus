@@ -32,3 +32,6 @@ outputs/*.jpeg
 outputs/*.svg
 outputs/*.pdf
 outputs/*.csv
+
+# Private personal travel documents
+docs/reference/ATPI_Itinerary_*
